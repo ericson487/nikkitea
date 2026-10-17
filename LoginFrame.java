@@ -215,7 +215,7 @@ public final class LoginFrame extends JFrame {
     private void login() {
         String username = usernameField.getText().trim();
         String password = new String(passwordField.getPassword());
-        if ("Dream Team3.0".equals(username) && "JAVACUP".equals(password)) {
+        if ("Dream Team1.0".equals(username) && "JAVACUP".equals(password)) {
             new MilkTeaPOS().setVisible(true);
             dispose();
             return;
