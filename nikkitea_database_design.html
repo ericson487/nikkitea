@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NIKKITEA Database Design</title>
+  <style>
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.6;
+      color: #1f2937;
+      background: #f8fafc;
+      margin: 0;
+      padding: 32px;
+    }
+    .page {
+      max-width: 980px;
+      margin: 0 auto;
+      background: white;
+      padding: 36px 42px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      border: 1px solid #e5e7eb;
+    }
+    h1, h2, h3 {
+      color: #111827;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+      font-size: 30px;
+    }
+    h2 {
+      border-bottom: 2px solid #dbeafe;
+      padding-bottom: 8px;
+      margin-top: 30px;
+      font-size: 22px;
+    }
+    h3 {
+      margin-top: 20px;
+      font-size: 18px;
+    }
+    p, li {
+      font-size: 15px;
+    }
+    ul, ol {
+      padding-left: 24px;
+    }
+    pre {
+      background: #f3f4f6;
+      border: 1px solid #e5e7eb;
+      padding: 16px;
+      overflow-x: auto;
+      font-size: 13px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .small {
+      font-size: 13px;
+      color: #374151;
+    }
+    .erd {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      padding: 18px;
+      font-family: Consolas, Monaco, monospace;
+      font-size: 14px;
+      line-height: 1.8;
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      .page {
+        box-shadow: none;
+        border: none;
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <h1>NIKKITEA POS SYSTEM</h1>
+    <h1>Database Design and Normalization</h1>
+    <p class="small">Prepared based on the NIKKITEA Java project repository: <strong>ericson487/nikkitea</strong></p>
+
+    <h2>1. Project Overview</h2>
+    <p>
+      NIKKITEA is a Java Swing Point-of-Sale application for selling milk tea, fruit tea, snacks,
+      and add-ons. The system includes login, menu selection, cart management, inventory tracking,
+      order type selection, cash checkout, and completed sales history.
+    </p>
+
+    <h2>2. Business Rules</h2>
+    <ul>
+      <li>A user may log in to the system using a username and password.</li>
+      <li>Each user has a role, either admin or cashier.</li>
+      <li>A user can create many orders.</li>
+      <li>Each order belongs to only one user.</li>
+      <li>An order has exactly one order type: DINE_IN or TAKE_OUT.</li>
+      <li>An order contains one or more order items.</li>
+      <li>Each order item refers to one product.</li>
+      <li>Each product belongs to one category.</li>
+      <li>Products can be categorized as Milk Tea, Fruit Tea, Snacks & Bites, or Add-ons.</li>
+      <li>A product may have add-ons selected during order creation.</li>
+      <li>Each order item may have sugar level and cup size values for drinks.</li>
+      <li>Inventory is tracked per product.</li>
+      <li>Stock cannot be negative.</li>
+      <li>When an order is completed and paid, inventory is reduced accordingly.</li>
+      <li>Cash payment is required for checkout.</li>
+      <li>Each completed order records total amount, amount paid, and change amount.</li>
+      <li>Historical order data should keep the price as it was at the time of sale.</li>
+    </ul>
+
+    <h2>3. ER Diagram</h2>
+    <div class="erd">
+USER ||--o{ ORDER : creates
+ORDER ||--o{ ORDER_ITEM : contains
+CATEGORY ||--o{ PRODUCT : classifies
+PRODUCT ||--o{ ORDER_ITEM : sold_as
+PRODUCT ||--o{ ORDER_ITEM_ADDON : selected_as_addon
+ORDER_ITEM ||--o{ ORDER_ITEM_ADDON : has_addons
+PRODUCT ||--|| INVENTORY : tracked_by
+ORDER ||--|| PAYMENT : has
+
+USER {
+  user_id PK
+  username
+  password_hash
+  full_name
+  role
+}
+
+CATEGORY {
+  category_id PK
+  category_name
+}
+
+PRODUCT {
+  product_id PK
+  category_id FK
+  product_code
+  product_name
+  base_price
+  image_file
+}
+
+INVENTORY {
+  product_id PK/FK
+  current_stock
+  low_stock_threshold
+  last_updated
+}
+
+ORDER {
+  order_id PK
+  user_id FK
+  order_type
+  status
+  order_date
+  total_amount
+  cash_tendered
+  change_amount
+}
+
+ORDER_ITEM {
+  order_item_id PK
+  order_id FK
+  product_id FK
+  quantity
+  sugar_level
+  cup_size
+  unit_price
+}
+
+ORDER_ITEM_ADDON {
+  order_item_addon_id PK
+  order_item_id FK
+  product_id FK
+  addon_price
+}
+
+PAYMENT {
+  payment_id PK
+  order_id FK
+  payment_method
+  amount_paid
+  change_amount
+  payment_date
+}
+    </div>
+
+    <h2>4. Relational Model</h2>
+    <pre>
+users(user_id, username, password_hash, full_name, role)
+categories(category_id, category_name)
+products(product_id, category_id, product_code, product_name, base_price, image_file, is_active)
+inventory(product_id, current_stock, low_stock_threshold, last_updated)
+orders(order_id, user_id, order_type, status, order_date, total_amount, cash_tendered, change_amount)
+order_items(order_item_id, order_id, product_id, quantity, sugar_level, cup_size, unit_price)
+order_item_addons(order_item_addon_id, order_item_id, product_id, addon_price)
+payments(payment_id, order_id, payment_method, amount_paid, change_amount, payment_date)
+    </pre>
+
+    <h2>5. Normalization</h2>
+    <h3>First Normal Form (1NF)</h3>
+    <p>
+      Each table contains atomic values only. Repeating groups are avoided. For example, add-ons are stored in a separate table instead of being embedded in order_items.
+    </p>
+
+    <h3>Second Normal Form (2NF)</h3>
+    <p>
+      All non-key attributes depend on the whole primary key. For example, order_item_addons store addon information for each order item and are not duplicated across multiple order rows.
+    </p>
+
+    <h3>Third Normal Form (3NF)</h3>
+    <p>
+      No transitive dependencies exist. Product category is stored in the categories table and referenced by foreign key, not repeated in every product record. User role is in the users table. Payment details are kept separate from orders for better normalization.
+    </p>
+
+    <h2>6. SQL Schema</h2>
+    <pre>
+CREATE TABLE users (
+    user_id SERIAL PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    full_name VARCHAR(100) NOT NULL,
+    role VARCHAR(20) NOT NULL CHECK (role IN ('admin', 'cashier')),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE categories (
+    category_id SERIAL PRIMARY KEY,
+    category_name VARCHAR(50) UNIQUE NOT NULL
+);
+
+CREATE TABLE products (
+    product_id SERIAL PRIMARY KEY,
+    category_id INT NOT NULL,
+    product_code VARCHAR(30) UNIQUE NOT NULL,
+    product_name VARCHAR(100) NOT NULL,
+    base_price NUMERIC(10,2) NOT NULL,
+    image_file VARCHAR(200),
+    is_active BOOLEAN DEFAULT TRUE,
+    CONSTRAINT fk_products_category
+        FOREIGN KEY (category_id) REFERENCES categories(category_id)
+);
+
+CREATE TABLE inventory (
+    product_id INT PRIMARY KEY,
+    current_stock INT NOT NULL DEFAULT 0,
+    low_stock_threshold INT NOT NULL DEFAULT 5,
+    last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_inventory_product
+        FOREIGN KEY (product_id) REFERENCES products(product_id)
+);
+
+CREATE TABLE orders (
+    order_id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL,
+    order_type VARCHAR(20) NOT NULL CHECK (order_type IN ('DINE_IN', 'TAKE_OUT')),
+    status VARCHAR(20) NOT NULL DEFAULT 'COMPLETED'
+        CHECK (status IN ('PENDING', 'COMPLETED', 'CANCELLED')),
+    order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    total_amount NUMERIC(10,2) NOT NULL DEFAULT 0,
+    cash_tendered NUMERIC(10,2) DEFAULT 0,
+    change_amount NUMERIC(10,2) DEFAULT 0,
+    CONSTRAINT fk_orders_user
+        FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+
+CREATE TABLE order_items (
+    order_item_id SERIAL PRIMARY KEY,
+    order_id INT NOT NULL,
+    product_id INT NOT NULL,
+    quantity INT NOT NULL CHECK (quantity > 0),
+    sugar_level VARCHAR(20) DEFAULT 'N/A',
+    cup_size VARCHAR(20) DEFAULT 'N/A',
+    unit_price NUMERIC(10,2) NOT NULL,
+    CONSTRAINT fk_order_items_order
+        FOREIGN KEY (order_id) REFERENCES orders(order_id),
+    CONSTRAINT fk_order_items_product
+        FOREIGN KEY (product_id) REFERENCES products(product_id)
+);
+
+CREATE TABLE order_item_addons (
+    order_item_addon_id SERIAL PRIMARY KEY,
+    order_item_id INT NOT NULL,
+    product_id INT NOT NULL,
+    addon_price NUMERIC(10,2) NOT NULL,
+    CONSTRAINT fk_order_item_addon_item
+        FOREIGN KEY (order_item_id) REFERENCES order_items(order_item_id),
+    CONSTRAINT fk_order_item_addon_product
+        FOREIGN KEY (product_id) REFERENCES products(product_id)
+);
+
+CREATE TABLE payments (
+    payment_id SERIAL PRIMARY KEY,
+    order_id INT NOT NULL UNIQUE,
+    payment_method VARCHAR(20) NOT NULL CHECK (payment_method IN ('CASH')),
+    amount_paid NUMERIC(10,2) NOT NULL,
+    change_amount NUMERIC(10,2) NOT NULL,
+    payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_payments_order
+        FOREIGN KEY (order_id) REFERENCES orders(order_id)
+);
+    </pre>
+
+    <h2>7. Sample Data</h2>
+    <pre>
+INSERT INTO users (username, password_hash, full_name, role)
+VALUES
+('dreamteam', 'hashed_password_123', 'Dream Team', 'admin'),
+('cashier01', 'hashed_password_456', 'Maria Santos', 'cashier');
+
+INSERT INTO categories (category_name)
+VALUES
+('Milk Tea'),
+('Fruit Tea'),
+('Snacks & Bites'),
+('Add-ons');
+
+INSERT INTO products (category_id, product_code, product_name, base_price, image_file)
+VALUES
+(1, 'MT-001', 'Wintermelon Cheese', 89.00, 'WintermelonC.jpg'),
+(1, 'MT-002', 'Hokkaido Milk Tea', 99.00, 'HOKAIDO.jpg'),
+(1, 'MT-003', 'Matcha Milk Tea', 95.00, 'Matcha.jpg'),
+(2, 'FT-001', 'Lychee Fruit Tea', 75.00, 'LYCHEE.jpg'),
+(2, 'FT-002', 'Mango Fruit Tea', 80.00, 'MANGO.jpg'),
+(3, 'SN-001', 'Fries', 60.00, 'fries.jpg'),
+(3, 'SN-002', 'Waffles', 70.00, 'waffles.jpg'),
+(3, 'SN-003', 'Pancake', 65.00, 'pancake.jpg'),
+(4, 'AD-001', 'Pearl', 15.00, 'Pearl.jpg'),
+(4, 'AD-002', 'Nata', 20.00, 'Nata.jpg'),
+(4, 'AD-003', 'Cheesecake', 25.00, 'Cheesecake.jpg'),
+(4, 'AD-004', 'Cream Cheese', 18.00, 'Creamcheese.jpg');
+
+INSERT INTO inventory (product_id, current_stock, low_stock_threshold)
+VALUES
+(1, 20, 5),
+(2, 18, 5),
+(3, 12, 5),
+(4, 15, 5),
+(5, 10, 5),
+(6, 8, 3),
+(7, 7, 3),
+(8, 9, 3),
+(9, 20, 5),
+(10, 18, 5),
+(11, 13, 5),
+(12, 16, 5);
+
+INSERT INTO orders (user_id, order_type, status, total_amount, cash_tendered, change_amount)
+VALUES
+(1, 'DINE_IN', 'COMPLETED', 289.00, 300.00, 11.00),
+(2, 'TAKE_OUT', 'COMPLETED', 180.00, 200.00, 20.00);
+
+INSERT INTO order_items (order_id, product_id, quantity, sugar_level, cup_size, unit_price)
+VALUES
+(1, 1, 2, '50%', '16 oz', 89.00),
+(1, 9, 1, 'N/A', 'N/A', 15.00),
+(1, 10, 1, 'N/A', 'N/A', 20.00),
+(2, 4, 1, '75%', '12 oz', 75.00),
+(2, 6, 1, 'N/A', 'N/A', 60.00),
+(2, 11, 1, 'N/A', 'N/A', 25.00);
+
+INSERT INTO order_item_addons (order_item_id, product_id, addon_price)
+VALUES
+(1, 9, 15.00),
+(1, 10, 20.00),
+(4, 11, 25.00);
+
+INSERT INTO payments (order_id, payment_method, amount_paid, change_amount)
+VALUES
+(1, 'CASH', 300.00, 11.00),
+(2, 'CASH', 200.00, 20.00);
+    </pre>
+
+    <h2>8. Final Conclusion</h2>
+    <p>
+      The NIKKITEA database should be centered around products, inventory, orders, and payments.
+      This structure supports the business processes of a POS system while maintaining data integrity,
+      accuracy, and normal form compliance. The result is a normalized database that can support sales,
+      inventory, user handling, and historical transaction records in a clean and efficient way.
+    </p>
+
+    <p class="small"><strong>Prepared for:</strong> NIKKITEA repository by ericson487</p>
+  </div>
+</body>
+</html>
