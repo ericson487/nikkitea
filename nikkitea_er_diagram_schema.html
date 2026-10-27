@@ -3,314 +3,345 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NIKKITEA ER Diagram & Relational Schema</title>
+  <title>NIKKITEA ER Diagram</title>
   <style>
     :root {
-      --bg: #f5f5f3;
+      --bg: #f1f1ef;
       --paper: #ffffff;
+      --ink: #222;
+      --muted: #555;
       --line: #cfcfcf;
-      --ink: #1d1d1d;
-      --muted: #5d5d5d;
-      --blue: #dfeafc;
-      --blue-dark: #2d4a72;
-      --green: #dff5e8;
-      --orange: #fbe9c8;
-      --purple: #e8e2ff;
-      --neutral: #f1f1f1;
-      --shadow: rgba(0,0,0,0.06);
+      --blue: #eaf0ff;
+      --green: #eaf8ef;
+      --yellow: #fff3d6;
+      --purple: #f1ebff;
+      --gray: #f4f4f4;
+      --shadow: rgba(0,0,0,0.04);
     }
 
     * { box-sizing: border-box; }
 
     body {
       margin: 0;
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
       background: var(--bg);
       color: var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
     }
 
     .page {
-      max-width: 1200px;
-      margin: 32px auto;
+      max-width: 1180px;
+      margin: 28px auto;
       background: var(--paper);
-      border: 1px solid #ddd;
-      box-shadow: 0 8px 22px var(--shadow);
-      padding: 28px 28px 40px;
+      border: 1px solid #d7d7d7;
+      box-shadow: 0 8px 18px var(--shadow);
+      padding: 28px 28px 26px;
     }
 
     h1 {
-      margin: 0 0 6px;
-      font-size: 30px;
-      letter-spacing: 0.5px;
+      margin: 0 0 8px;
       text-align: center;
+      font-size: 28px;
+      font-weight: 700;
     }
 
-    h2 {
-      font-size: 20px;
-      margin: 26px 0 14px;
-      padding-bottom: 6px;
-      border-bottom: 2px solid #e5e5e5;
-    }
-
-    .subtitle {
+    .title-bar {
       text-align: center;
+      font-size: 12px;
       color: var(--muted);
-      font-size: 14px;
-      margin-bottom: 18px;
+      margin-bottom: 12px;
+      letter-spacing: 0.4px;
     }
 
-    .erd-wrap {
-      margin-top: 14px;
-      padding: 12px 10px 10px;
-      background: linear-gradient(#fafafa, #f8f8f8);
-      border: 1px solid #e7e7e7;
-      border-radius: 8px;
-    }
-
-    .erd-grid {
-      display: grid;
-      grid-template-columns: repeat(6, minmax(130px, 1fr));
-      gap: 22px 18px;
-      align-items: center;
-      justify-items: center;
-      min-height: 480px;
+    .canvas {
+      border: 1px solid #d9d9d9;
+      background: linear-gradient(180deg, #fafafa 0%, #f5f5f5 100%);
+      min-height: 840px;
+      padding: 16px;
+      position: relative;
+      overflow: hidden;
     }
 
     .entity {
-      width: 100%;
-      max-width: 150px;
-      background: #fff;
-      border: 1.5px solid #b9b9b9;
+      position: absolute;
+      width: 140px;
+      min-height: 110px;
       border-radius: 10px;
+      border: 1.5px solid #b7b7b7;
       box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+      padding: 9px 8px 8px;
       text-align: center;
-      padding: 8px 8px 10px;
+      background: #fff;
     }
 
     .entity h3 {
       margin: 0 0 8px;
       font-size: 12px;
-      letter-spacing: 0.5px;
       font-weight: 700;
-      color: #1d1d1d;
+      letter-spacing: 0.4px;
     }
 
     .entity ul {
       list-style: none;
       margin: 0;
       padding: 0;
-      font-size: 10.5px;
-      color: #303030;
-      line-height: 1.6;
+      font-size: 10px;
+      line-height: 1.5;
+      color: #373737;
     }
 
-    .entity ul li {
-      border-top: 1px solid #ededed;
+    .entity li {
+      border-top: 1px solid rgba(0,0,0,0.08);
       padding-top: 2px;
       margin-top: 2px;
     }
 
-    .entity ul li:first-child {
+    .entity li:first-child {
       border-top: none;
-      margin-top: 0;
       padding-top: 0;
+      margin-top: 0;
     }
 
-    .entity.user { background: var(--blue); }
-    .entity.category { background: var(--green); }
-    .entity.product { background: var(--orange); }
-    .entity.inventory { background: var(--neutral); }
-    .entity.order { background: var(--purple); }
-    .entity.order_item { background: var(--blue); }
-    .entity.addon { background: var(--green); }
-    .entity.order_item_addon { background: var(--orange); }
-    .entity.payment { background: var(--neutral); }
-    .entity.sale { background: var(--purple); }
+    .user { left: 40px; top: 120px; background: var(--blue); }
+    .category { left: 240px; top: 50px; background: var(--green); }
+    .product { left: 440px; top: 120px; background: var(--yellow); }
+    .inventory { left: 240px; top: 300px; background: var(--gray); }
+    .order { left: 665px; top: 160px; background: var(--purple); }
+    .payment { left: 900px; top: 120px; background: var(--gray); }
+    .order_item { left: 900px; top: 300px; background: var(--blue); }
+    .addon { left: 680px; top: 520px; background: var(--green); }
+    .order_item_addon { left: 430px; top: 580px; background: var(--yellow); }
+    .sale { left: 150px; top: 600px; background: var(--purple); }
 
-    .relationship { 
-      text-align: center; 
-      font-size: 11px; 
-      color: #4a4a4a; 
+    .connector {
+      position: absolute;
+      border: 1px solid rgba(0,0,0,0.35);
+      background: transparent;
+      pointer-events: none;
+    }
+
+    .c1 { left: 180px; top: 155px; width: 60px; border-top: 1px solid #7e7e7e; }
+    .c2 { left: 345px; top: 82px; width: 95px; border-top: 1px solid #7e7e7e; }
+    .c3 { left: 280px; top: 111px; width: 0; height: 70px; border-left: 1px solid #7e7e7e; }
+    .c4 { left: 565px; top: 165px; width: 100px; border-top: 1px solid #7e7e7e; }
+    .c5 { left: 1032px; top: 185px; width: 0; height: 115px; border-left: 1px solid #7e7e7e; }
+    .c6 { left: 965px; top: 435px; width: 0; height: 85px; border-left: 1px solid #7e7e7e; }
+    .c7 { left: 770px; top: 410px; width: 130px; border-top: 1px solid #7e7e7e; }
+    .c8 { left: 540px; top: 630px; width: 140px; border-top: 1px solid #7e7e7e; }
+    .c9 { left: 295px; top: 365px; width: 135px; border-top: 1px solid #7e7e7e; }
+    .c10 { left: 700px; top: 420px; width: 0; height: 100px; border-left: 1px solid #7e7e7e; }
+    .c11 { left: 320px; top: 644px; width: 110px; border-top: 1px solid #7e7e7e; }
+    .c12 { left: 280px; top: 205px; width: 0; height: 95px; border-left: 1px solid #7e7e7e; }
+
+    .label {
+      position: absolute;
+      font-size: 10px;
       font-weight: 600;
-      margin: 8px 0;
-      letter-spacing: 0.4px;
+      color: #4b4b4b;
+      background: rgba(255,255,255,0.7);
+      padding: 2px 5px;
+      border-radius: 4px;
     }
 
-    .schema {
-      margin-top: 18px;
-      background: #f7f7f7;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 14px 16px;
-    }
+    .l1 { left: 188px; top: 144px; }
+    .l2 { left: 370px; top: 62px; }
+    .l3 { left: 520px; top: 146px; }
+    .l4 { left: 1015px; top: 240px; }
+    .l5 { left: 800px; top: 430px; }
+    .l6 { left: 565px; top: 610px; }
+    .l7 { left: 312px; top: 355px; }
+    .l8 { left: 350px; top: 640px; }
 
-    .schema h3 {
-      margin: 0 0 10px;
+    .section-title {
+      margin-top: 16px;
       font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .schema-wrap {
+      border: 1px solid #d5d5d5;
+      background: #fafafa;
+      padding: 10px 12px 12px;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 13px;
+      font-size: 12px;
       background: #fff;
     }
 
     th, td {
-      border: 1px solid #d8d8d8;
-      padding: 8px 10px;
+      border: 1px solid #d2d2d2;
+      padding: 8px 9px;
       text-align: left;
       vertical-align: top;
     }
 
     th {
-      background: #f0f0f0;
+      background: #efefef;
       font-weight: 700;
     }
 
-    .code {
+    .sql {
       margin-top: 18px;
-      background: #111827;
-      color: #e5f1ff;
+      background: #0d1726;
+      color: #e6efff;
+      border: 1px solid #101827;
       border-radius: 8px;
-      padding: 14px 16px;
-      overflow-x: auto;
+      padding: 12px 14px;
       font-family: Consolas, "Courier New", monospace;
-      font-size: 12.5px;
-      line-height: 1.65;
+      font-size: 12px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      overflow-x: auto;
     }
 
-    .code .key { color: #a5d8ff; }
-    .code .str { color: #c7f9cc; }
-    .code .num { color: #ffd585; }
+    .kw { color: #7dd3fc; }
+    .str { color: #86efac; }
 
     @media (max-width: 900px) {
-      .erd-grid {
-        grid-template-columns: repeat(2, minmax(130px, 1fr));
-      }
-      .page { padding: 18px 16px 28px; }
+      .page { padding: 14px; }
+      .canvas { min-height: 1200px; }
+      .entity { transform: scale(0.9); }
     }
   </style>
 </head>
 <body>
   <div class="page">
     <h1>ER Diagram</h1>
-    <div class="subtitle">NIKKITEA POS System based on ericson487/nikkitea repository</div>
+    <div class="title-bar">NIKKITEA POS Database Design</div>
 
-    <div class="erd-wrap">
-      <div class="erd-grid">
-        <div class="entity user">
-          <h3>USER</h3>
-          <ul>
-            <li>user_id</li>
-            <li>username</li>
-            <li>password_hash</li>
-            <li>full_name</li>
-            <li>role</li>
-          </ul>
-        </div>
-
-        <div class="entity category">
-          <h3>CATEGORY</h3>
-          <ul>
-            <li>category_id</li>
-            <li>category_name</li>
-          </ul>
-        </div>
-
-        <div class="entity product">
-          <h3>PRODUCT</h3>
-          <ul>
-            <li>product_id</li>
-            <li>category_id</li>
-            <li>product_code</li>
-            <li>product_name</li>
-            <li>base_price</li>
-          </ul>
-        </div>
-
-        <div class="entity inventory">
-          <h3>INVENTORY</h3>
-          <ul>
-            <li>product_id</li>
-            <li>current_stock</li>
-            <li>low_stock_threshold</li>
-          </ul>
-        </div>
-
-        <div class="entity order">
-          <h3>ORDER</h3>
-          <ul>
-            <li>order_id</li>
-            <li>user_id</li>
-            <li>order_type</li>
-            <li>status</li>
-            <li>total_amount</li>
-          </ul>
-        </div>
-
-        <div class="entity payment">
-          <h3>PAYMENT</h3>
-          <ul>
-            <li>payment_id</li>
-            <li>order_id</li>
-            <li>amount_paid</li>
-            <li>change_amount</li>
-          </ul>
-        </div>
-
-        <div class="entity order_item">
-          <h3>ORDER_ITEM</h3>
-          <ul>
-            <li>order_item_id</li>
-            <li>order_id</li>
-            <li>product_id</li>
-            <li>quantity</li>
-            <li>unit_price</li>
-          </ul>
-        </div>
-
-        <div class="entity addon">
-          <h3>ADD_ON</h3>
-          <ul>
-            <li>addon_id</li>
-            <li>name</li>
-            <li>price</li>
-          </ul>
-        </div>
-
-        <div class="entity order_item_addon">
-          <h3>ORDER_ITEM_ADDON</h3>
-          <ul>
-            <li>order_item_addon_id</li>
-            <li>order_item_id</li>
-            <li>addon_id</li>
-            <li>addon_price</li>
-          </ul>
-        </div>
-
-        <div class="entity sale">
-          <h3>SALE</h3>
-          <ul>
-            <li>sale_id</li>
-            <li>order_id</li>
-            <li>receipt</li>
-            <li>total</li>
-            <li>completed_at</li>
-          </ul>
-        </div>
+    <div class="canvas">
+      <div class="entity user">
+        <h3>USER</h3>
+        <ul>
+          <li>user_id</li>
+          <li>username</li>
+          <li>password_hash</li>
+          <li>role</li>
+        </ul>
       </div>
+
+      <div class="entity category">
+        <h3>CATEGORY</h3>
+        <ul>
+          <li>category_id</li>
+          <li>category_name</li>
+        </ul>
+      </div>
+
+      <div class="entity product">
+        <h3>PRODUCT</h3>
+        <ul>
+          <li>product_id</li>
+          <li>category_id</li>
+          <li>name</li>
+          <li>base_price</li>
+        </ul>
+      </div>
+
+      <div class="entity inventory">
+        <h3>INVENTORY</h3>
+        <ul>
+          <li>product_id</li>
+          <li>stock</li>
+          <li>threshold</li>
+        </ul>
+      </div>
+
+      <div class="entity order">
+        <h3>ORDER</h3>
+        <ul>
+          <li>order_id</li>
+          <li>user_id</li>
+          <li>order_type</li>
+          <li>status</li>
+        </ul>
+      </div>
+
+      <div class="entity payment">
+        <h3>PAYMENT</h3>
+        <ul>
+          <li>payment_id</li>
+          <li>order_id</li>
+          <li>amount_paid</li>
+          <li>change</li>
+        </ul>
+      </div>
+
+      <div class="entity order_item">
+        <h3>ORDER_ITEM</h3>
+        <ul>
+          <li>order_item_id</li>
+          <li>order_id</li>
+          <li>product_id</li>
+          <li>qty</li>
+          <li>unit_price</li>
+        </ul>
+      </div>
+
+      <div class="entity addon">
+        <h3>ADD_ON</h3>
+        <ul>
+          <li>addon_id</li>
+          <li>addon_name</li>
+          <li>price</li>
+        </ul>
+      </div>
+
+      <div class="entity order_item_addon">
+        <h3>ORDER_ITEM_ADDON</h3>
+        <ul>
+          <li>order_item_addon_id</li>
+          <li>order_item_id</li>
+          <li>addon_id</li>
+        </ul>
+      </div>
+
+      <div class="entity sale">
+        <h3>SALE</h3>
+        <ul>
+          <li>sale_id</li>
+          <li>order_id</li>
+          <li>receipt</li>
+          <li>total</li>
+          <li>completed_at</li>
+        </ul>
+      </div>
+
+      <div class="connector c1"></div>
+      <div class="connector c2"></div>
+      <div class="connector c3"></div>
+      <div class="connector c4"></div>
+      <div class="connector c5"></div>
+      <div class="connector c6"></div>
+      <div class="connector c7"></div>
+      <div class="connector c8"></div>
+      <div class="connector c9"></div>
+      <div class="connector c10"></div>
+      <div class="connector c11"></div>
+      <div class="connector c12"></div>
+
+      <div class="label l1">creates</div>
+      <div class="label l2">belongs to</div>
+      <div class="label l3">contains</div>
+      <div class="label l4">paid by</div>
+      <div class="label l5">includes</div>
+      <div class="label l6">records</div>
+      <div class="label l7">tracks</div>
+      <div class="label l8">stores</div>
     </div>
 
-    <div class="schema">
-      <h2>Relational Schema</h2>
+    <div class="section-title">Relational Schema</div>
+    <div class="schema-wrap">
       <table>
         <thead>
           <tr>
             <th>Table</th>
             <th>Primary Key</th>
             <th>Foreign Key(s)</th>
-            <th>Notes</th>
+            <th>Description</th>
           </tr>
         </thead>
         <tbody>
@@ -318,155 +349,147 @@
             <td>users</td>
             <td>user_id</td>
             <td>-</td>
-            <td>Staff/admin login and role info.</td>
+            <td>Login and role records for cashier/admin.</td>
           </tr>
           <tr>
             <td>categories</td>
             <td>category_id</td>
             <td>-</td>
-            <td>Groups menu items such as Milk Tea, Fruit Tea, Snacks, Add-ons.</td>
+            <td>Menu categories such as Milk Tea, Fruit Tea, Snacks, Add-ons.</td>
           </tr>
           <tr>
             <td>products</td>
             <td>product_id</td>
             <td>category_id → categories.category_id</td>
-            <td>Stores product code, name, and base price.</td>
+            <td>Menu item details and base price.</td>
           </tr>
           <tr>
             <td>inventory</td>
             <td>product_id</td>
             <td>product_id → products.product_id</td>
-            <td>Tracks current stock and low-stock threshold.</td>
+            <td>Current stock and low-stock threshold.</td>
           </tr>
           <tr>
             <td>orders</td>
             <td>order_id</td>
             <td>user_id → users.user_id</td>
-            <td>Captures order type, status, totals, and payment data.</td>
+            <td>Order transaction and order type.</td>
           </tr>
           <tr>
             <td>order_items</td>
             <td>order_item_id</td>
             <td>order_id → orders.order_id, product_id → products.product_id</td>
-            <td>Stores quantity, customization, and item price at purchase time.</td>
+            <td>Each item on an order, including quantity and customization.</td>
           </tr>
           <tr>
             <td>add_ons</td>
             <td>addon_id</td>
             <td>-</td>
-            <td>Reusable add-on menu such as Pearl, Nata, Cheese, etc.</td>
+            <td>Reusable add-on items that can be added to a product.</td>
           </tr>
           <tr>
             <td>order_item_addons</td>
             <td>order_item_addon_id</td>
             <td>order_item_id → order_items.order_item_id, addon_id → add_ons.addon_id</td>
-            <td>Tracks selected add-ons per order line item.</td>
+            <td>Selected add-ons per line item.</td>
           </tr>
           <tr>
             <td>payments</td>
             <td>payment_id</td>
             <td>order_id → orders.order_id</td>
-            <td>Stores cash amount and change given.</td>
+            <td>Cash amount and change amount collected.</td>
           </tr>
           <tr>
             <td>sales</td>
             <td>sale_id</td>
             <td>order_id → orders.order_id</td>
-            <td>Stores receipt and completed sales history for the app dashboard.</td>
+            <td>Receipt and completed sales history.</td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <div class="code">
-<span class="key">CREATE TABLE</span> users (
-  user_id <span class="key">SERIAL PRIMARY KEY</span>,
-  username <span class="key">VARCHAR</span>(50) <span class="key">UNIQUE NOT NULL</span>,
-  password_hash <span class="key">VARCHAR</span>(255) <span class="key">NOT NULL</span>,
-  full_name <span class="key">VARCHAR</span>(100) <span class="key">NOT NULL</span>,
-  role <span class="key">VARCHAR</span>(20) <span class="key">NOT NULL CHECK</span> (role IN (<span class="str">'admin'</span>, <span class="str">'cashier'</span>))
+    <div class="sql"><span class="kw">CREATE TABLE</span> users (
+  user_id <span class="kw">SERIAL PRIMARY KEY</span>,
+  username <span class="kw">VARCHAR</span>(50) <span class="kw">UNIQUE NOT NULL</span>,
+  password_hash <span class="kw">VARCHAR</span>(255) <span class="kw">NOT NULL</span>,
+  full_name <span class="kw">VARCHAR</span>(100) <span class="kw">NOT NULL</span>,
+  role <span class="kw">VARCHAR</span>(20) <span class="kw">NOT NULL CHECK</span> (role IN (<span class="str">'admin'</span>, <span class="str">'cashier'</span>))
 );
 
-<span class="key">CREATE TABLE</span> categories (
-  category_id <span class="key">SERIAL PRIMARY KEY</span>,
-  category_name <span class="key">VARCHAR</span>(50) <span class="key">UNIQUE NOT NULL</span>
+<span class="kw">CREATE TABLE</span> categories (
+  category_id <span class="kw">SERIAL PRIMARY KEY</span>,
+  category_name <span class="kw">VARCHAR</span>(50) <span class="kw">UNIQUE NOT NULL</span>
 );
 
-<span class="key">CREATE TABLE</span> products (
-  product_id <span class="key">SERIAL PRIMARY KEY</span>,
-  category_id <span class="key">INT NOT NULL</span>,
-  product_code <span class="key">VARCHAR</span>(30) <span class="key">UNIQUE NOT NULL</span>,
-  product_name <span class="key">VARCHAR</span>(100) <span class="key">NOT NULL</span>,
-  base_price <span class="key">NUMERIC</span>(10,2) <span class="key">NOT NULL</span>,
-  image_file <span class="key">VARCHAR</span>(200),
-  is_active <span class="key">BOOLEAN DEFAULT TRUE</span>,
-  <span class="key">FOREIGN KEY</span> (category_id) <span class="key">REFERENCES</span> categories(category_id)
+<span class="kw">CREATE TABLE</span> products (
+  product_id <span class="kw">SERIAL PRIMARY KEY</span>,
+  category_id <span class="kw">INT NOT NULL</span>,
+  product_code <span class="kw">VARCHAR</span>(30) <span class="kw">UNIQUE NOT NULL</span>,
+  product_name <span class="kw">VARCHAR</span>(100) <span class="kw">NOT NULL</span>,
+  base_price <span class="kw">NUMERIC</span>(10,2) <span class="kw">NOT NULL</span>,
+  <span class="kw">FOREIGN KEY</span> (category_id) <span class="kw">REFERENCES</span> categories(category_id)
 );
 
-<span class="key">CREATE TABLE</span> inventory (
-  product_id <span class="key">INT PRIMARY KEY</span>,
-  current_stock <span class="key">INT NOT NULL DEFAULT 0</span>,
-  low_stock_threshold <span class="key">INT NOT NULL DEFAULT 5</span>,
-  last_updated <span class="key">TIMESTAMP DEFAULT CURRENT_TIMESTAMP</span>,
-  <span class="key">FOREIGN KEY</span> (product_id) <span class="key">REFERENCES</span> products(product_id)
+<span class="kw">CREATE TABLE</span> inventory (
+  product_id <span class="kw">INT PRIMARY KEY</span>,
+  current_stock <span class="kw">INT NOT NULL DEFAULT 0</span>,
+  low_stock_threshold <span class="kw">INT NOT NULL DEFAULT 5</span>,
+  <span class="kw">FOREIGN KEY</span> (product_id) <span class="kw">REFERENCES</span> products(product_id)
 );
 
-<span class="key">CREATE TABLE</span> orders (
-  order_id <span class="key">SERIAL PRIMARY KEY</span>,
-  user_id <span class="key">INT NOT NULL</span>,
-  order_type <span class="key">VARCHAR</span>(20) <span class="key">NOT NULL CHECK</span> (order_type IN (<span class="str">'DINE_IN'</span>, <span class="str">'TAKE_OUT'</span>)),
-  status <span class="key">VARCHAR</span>(20) <span class="key">DEFAULT 'COMPLETED'</span>,
-  order_date <span class="key">TIMESTAMP DEFAULT CURRENT_TIMESTAMP</span>,
-  total_amount <span class="key">NUMERIC</span>(10,2) <span class="key">NOT NULL DEFAULT 0</span>,
-  <span class="key">FOREIGN KEY</span> (user_id) <span class="key">REFERENCES</span> users(user_id)
+<span class="kw">CREATE TABLE</span> orders (
+  order_id <span class="kw">SERIAL PRIMARY KEY</span>,
+  user_id <span class="kw">INT NOT NULL</span>,
+  order_type <span class="kw">VARCHAR</span>(20) <span class="kw">NOT NULL CHECK</span> (order_type IN (<span class="str">'DINE_IN'</span>, <span class="str">'TAKE_OUT'</span>)),
+  status <span class="kw">VARCHAR</span>(20) <span class="kw">DEFAULT 'COMPLETED'</span>,
+  total_amount <span class="kw">NUMERIC</span>(10,2) <span class="kw">NOT NULL DEFAULT 0</span>,
+  <span class="kw">FOREIGN KEY</span> (user_id) <span class="kw">REFERENCES</span> users(user_id)
 );
 
-<span class="key">CREATE TABLE</span> order_items (
-  order_item_id <span class="key">SERIAL PRIMARY KEY</span>,
-  order_id <span class="key">INT NOT NULL</span>,
-  product_id <span class="key">INT NOT NULL</span>,
-  quantity <span class="key">INT NOT NULL CHECK</span> (quantity > 0),
-  sugar_level <span class="key">VARCHAR</span>(20) <span class="key">DEFAULT 'N/A'</span>,
-  cup_size <span class="key">VARCHAR</span>(20) <span class="key">DEFAULT 'N/A'</span>,
-  unit_price <span class="key">NUMERIC</span>(10,2) <span class="key">NOT NULL</span>,
-  <span class="key">FOREIGN KEY</span> (order_id) <span class="key">REFERENCES</span> orders(order_id),
-  <span class="key">FOREIGN KEY</span> (product_id) <span class="key">REFERENCES</span> products(product_id)
+<span class="kw">CREATE TABLE</span> order_items (
+  order_item_id <span class="kw">SERIAL PRIMARY KEY</span>,
+  order_id <span class="kw">INT NOT NULL</span>,
+  product_id <span class="kw">INT NOT NULL</span>,
+  quantity <span class="kw">INT NOT NULL CHECK</span> (quantity > 0),
+  sugar_level <span class="kw">VARCHAR</span>(20) <span class="kw">DEFAULT 'N/A'</span>,
+  cup_size <span class="kw">VARCHAR</span>(20) <span class="kw">DEFAULT 'N/A'</span>,
+  unit_price <span class="kw">NUMERIC</span>(10,2) <span class="kw">NOT NULL</span>,
+  <span class="kw">FOREIGN KEY</span> (order_id) <span class="kw">REFERENCES</span> orders(order_id),
+  <span class="kw">FOREIGN KEY</span> (product_id) <span class="kw">REFERENCES</span> products(product_id)
 );
 
-<span class="key">CREATE TABLE</span> add_ons (
-  addon_id <span class="key">SERIAL PRIMARY KEY</span>,
-  addon_name <span class="key">VARCHAR</span>(80) <span class="key">UNIQUE NOT NULL</span>,
-  addon_price <span class="key">NUMERIC</span>(10,2) <span class="key">NOT NULL DEFAULT 0</span>
+<span class="kw">CREATE TABLE</span> add_ons (
+  addon_id <span class="kw">SERIAL PRIMARY KEY</span>,
+  addon_name <span class="kw">VARCHAR</span>(80) <span class="kw">UNIQUE NOT NULL</span>,
+  addon_price <span class="kw">NUMERIC</span>(10,2) <span class="kw">NOT NULL DEFAULT 0</span>
 );
 
-<span class="key">CREATE TABLE</span> order_item_addons (
-  order_item_addon_id <span class="key">SERIAL PRIMARY KEY</span>,
-  order_item_id <span class="key">INT NOT NULL</span>,
-  addon_id <span class="key">INT NOT NULL</span>,
-  addon_price <span class="key">NUMERIC</span>(10,2) <span class="key">NOT NULL</span>,
-  <span class="key">FOREIGN KEY</span> (order_item_id) <span class="key">REFERENCES</span> order_items(order_item_id),
-  <span class="key">FOREIGN KEY</span> (addon_id) <span class="key">REFERENCES</span> add_ons(addon_id)
+<span class="kw">CREATE TABLE</span> order_item_addons (
+  order_item_addon_id <span class="kw">SERIAL PRIMARY KEY</span>,
+  order_item_id <span class="kw">INT NOT NULL</span>,
+  addon_id <span class="kw">INT NOT NULL</span>,
+  addon_price <span class="kw">NUMERIC</span>(10,2) <span class="kw">NOT NULL</span>,
+  <span class="kw">FOREIGN KEY</span> (order_item_id) <span class="kw">REFERENCES</span> order_items(order_item_id),
+  <span class="kw">FOREIGN KEY</span> (addon_id) <span class="kw">REFERENCES</span> add_ons(addon_id)
 );
 
-<span class="key">CREATE TABLE</span> payments (
-  payment_id <span class="key">SERIAL PRIMARY KEY</span>,
-  order_id <span class="key">INT NOT NULL</span>,
-  amount_paid <span class="key">NUMERIC</span>(10,2) <span class="key">NOT NULL</span>,
-  change_amount <span class="key">NUMERIC</span>(10,2) <span class="key">NOT NULL DEFAULT 0</span>,
-  paid_at <span class="key">TIMESTAMP DEFAULT CURRENT_TIMESTAMP</span>,
-  <span class="key">FOREIGN KEY</span> (order_id) <span class="key">REFERENCES</span> orders(order_id)
+<span class="kw">CREATE TABLE</span> payments (
+  payment_id <span class="kw">SERIAL PRIMARY KEY</span>,
+  order_id <span class="kw">INT NOT NULL</span>,
+  amount_paid <span class="kw">NUMERIC</span>(10,2) <span class="kw">NOT NULL</span>,
+  change_amount <span class="kw">NUMERIC</span>(10,2) <span class="kw">NOT NULL DEFAULT 0</span>,
+  <span class="kw">FOREIGN KEY</span> (order_id) <span class="kw">REFERENCES</span> orders(order_id)
 );
 
-<span class="key">CREATE TABLE</span> sales (
-  sale_id <span class="key">SERIAL PRIMARY KEY</span>,
-  order_id <span class="key">INT NOT NULL</span>,
-  receipt <span class="key">TEXT</span>,
-  total <span class="key">NUMERIC</span>(10,2) <span class="key">NOT NULL</span>,
-  order_type <span class="key">VARCHAR</span>(20) <span class="key">NOT NULL</span>,
-  completed_at <span class="key">TIMESTAMP DEFAULT CURRENT_TIMESTAMP</span>,
-  <span class="key">FOREIGN KEY</span> (order_id) <span class="key">REFERENCES</span> orders(order_id)
-);
-    </div>
+<span class="kw">CREATE TABLE</span> sales (
+  sale_id <span class="kw">SERIAL PRIMARY KEY</span>,
+  order_id <span class="kw">INT NOT NULL</span>,
+  receipt <span class="kw">TEXT</span>,
+  total <span class="kw">NUMERIC</span>(10,2) <span class="kw">NOT NULL</span>,
+  completed_at <span class="kw">TIMESTAMP DEFAULT CURRENT_TIMESTAMP</span>,
+  <span class="kw">FOREIGN KEY</span> (order_id) <span class="kw">REFERENCES</span> orders(order_id)
+);</div>
   </div>
 </body>
 </html>
